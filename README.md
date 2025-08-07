@@ -1,57 +1,56 @@
-# Administrador del albergue del Hospital del Niño Poblano
+# Manager for Puebla Children's Hospital Shelter (Albergue del Hospital del Niño Poblano)
 
-<!-- ### En colaboración con el Instituto Tecnológico y de Estudios Superiores de Monterrey y el Albergue del Hospital del Niño Poblano. -->
+<!-### In collaboration with the Instituto Tecnológico y de Estudios Superiores de Monterrey and the Puebla Children's Hospital Shelter. -->
 
-<!--Ctrl+Shift+V en VSCode para consultar la vista previa de este archivo -->
+<!--Ctrl+Shift+V in VSCode to preview this file -->
 
-Aplicación desarrollada del 19 de febrero al 14 de junio de 2024.
+Application developed from February 19 to June 14, 2024.
 
-Entrega realizada el 12 de junio de 2024.
+Delivered on June 12, 2024.
 
-## Ejecución general
+## General Setup
 
-Estos pasos son necesarios para realizar tanto la instalación local como en una red cerrada del sistema.
+These steps are necessary for both local installation and installation on a closed network.
 
-Para ejecutar el proyecto es necesario importar la base de datos de la carpeta "dump" en una base de datos de MySQL. En este caso se utiliza PostgreSQL con PGAdmin4.
+To run the project, it is necessary to import the database from the "dump" folder into a MySQL database. In this case, PostgreSQL with PGAdmin4 is used.
 
-Igualmente, es necesario cambiar estos valores en el archivo [db_connection.js](server/db_connection.js).
-Es necesario modificar también el valor de API_URL en el archivo [App.jsx](client/src/App.jsx) con la dirección ip local del sistema.
+Likewise, it is necessary to change these values in the [db_connection.js](server/db_connection.js) file.
+It is also necessary to modify the API_URL value in the [App.jsx](client/src/App.jsx) file with the system's local IP address.
 
+## Local Execution
 
-## Ejecución local
-
-Abrir la carpeta "server" y la carpeta "client" en dos terminales individuales. Ejecutar los siguientes comandos en cada una de las terminales recién abiertas:
+Open the "server" folder and the "client" folder in two separate terminals. Run the following commands in each of the newly opened terminals:
 
     npm install
 
     npm start
 
-Dirigirse a la dirección establecida en API_URL (por defecto localhost:3000).
+Navigate to the address set in API_URL (default is localhost:3000).
 
-## Ejecución remota
+## Remote Execution
 
-También es posible utilizar Docker para la instalación de este sistema de forma remota. Para ello, y tras haber instalado Docker:
+It is also possible to use Docker for a remote installation of this system. To do this, after having installed Docker:
 
-En la carpeta client, ejecutar el siguiente comando:
+In the client folder, run the following command:
 
     docker image build -t gestion-front-image:latest .
 
-En la carpeta server, por su parte, ejecutar:
+In the server folder, run:
 
     docker image build -t gestion-back-image:latest .
 
-Una vez hecho esto, dirigirse a la dirección establecida en API_URL (por ejemplo, http://192.168.1.68:8008). Cualquier persona dentro de la red debería poder acceder al sistema con esta misma URL.
+Once this is done, navigate to the address set in API_URL (for example, http://192.168.1.68:8008). Anyone on the network should be able to access the system with this same URL.
 
-### Desarrolladores
+### Developers
 
-- Hugo Muñoz Rodríguez
+[Hugo Muñoz Rodríguez](https://github.com/hugo1808)
 
-- Daniela Lozada Bracamontes
+[Daniela Lozada Bracamontes](https://github.com/Daniy23)
 
-- José Luis Zago Guevara
+[José Luis Zago Guevara](https://github.com/GhulRasal)
 
-- Christian Flores Alberto
+[Christian Flores Alberto](https://github.com/christian1444)
 
-- César Guerra Martínez 
+[César Guerra Martínez](https://github.com/CesarGMtz)
 
-- Alejandro Daniel Moctezuma Cruz
+[Alejandro Daniel Moctezuma Cruz](https://github.com/AlejandroMoc)
