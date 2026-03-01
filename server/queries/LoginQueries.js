@@ -1,34 +1,34 @@
-const db = require('../db_connection');
-const bcrypt = require('bcryptjs');
+const db = require("../db_connection");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 //Funciones para generación de Tokens
-function sign(payload, isAccessToken){
+function sign(payload, isAccessToken) {
   return jwt.sign(
     payload,
     isAccessToken
-    ? process.env.ACCESS_TOKEN_SECRET
-    : process.env.REFRESH_TOKEN_SECRET,
+      ? process.env.ACCESS_TOKEN_SECRET
+      : process.env.REFRESH_TOKEN_SECRET,
     {
-      algorithm:"HS256",
+      algorithm: "HS256",
       expiresIn: 86400,
     }
   );
 }
 
-function getUserInfo(user){
-  return{
+function getUserInfo(user) {
+  return {
     nombre_u: user.nombre_u,
     id_usuario: user.id_usuario,
   };
 }
 
 function generateAccessToken(user) {
-  return sign({user},true);
+  return sign({ user }, true);
 }
 
-function generateRefreshToken(user){
-  return sign({user}, false);
+function generateRefreshToken(user) {
+  return sign({ user }, false);
 }
 
 //Para crear un token y asignarlo
@@ -40,10 +40,9 @@ const createRefreshToken = async (existingUser) => {
   try {
     const refreshToken = await generateRefreshToken(existingUser);
 
-    await db.none(
-      `INSERT INTO tokens (id_token, token) VALUES (DEFAULT, $1)`,
-      [refreshToken]
-    );
+    await db.none(`INSERT INTO tokens (id_token, token) VALUES (DEFAULT, $1)`, [
+      refreshToken,
+    ]);
 
     return refreshToken;
   } catch (error) {
@@ -56,13 +55,16 @@ const getNewAdmin = async (nombre_u, contrasena, admin) => {
   try {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
     const existingUser = await db.oneOrNone(
-      'SELECT * FROM usuario WHERE nombre_u = $1',
+      "SELECT * FROM usuario WHERE nombre_u = $1",
       [nombre_u]
     );
     if (existingUser) {
-      throw new Error('Usuario existente');
+      throw new Error("Usuario existente");
     }
-    await db.none(`INSERT INTO usuario (nombre_u, contrasena, admin) VALUES ($1, $2, $3)`,[nombre_u, hashedPassword, admin]);
+    await db.none(
+      `INSERT INTO usuario (nombre_u, contrasena, admin) VALUES ($1, $2, $3)`,
+      [nombre_u, hashedPassword, admin]
+    );
     //console.log("Se insertó nuevo admin");
   } catch (error) {
     throw error;
@@ -72,21 +74,24 @@ const getNewAdmin = async (nombre_u, contrasena, admin) => {
 const getNewLogin = async (nombre_u, contrasena) => {
   try {
     const existingUser = await db.oneOrNone(
-      'SELECT * FROM usuario WHERE nombre_u = $1',
+      "SELECT * FROM usuario WHERE nombre_u = $1",
       [nombre_u]
     );
     if (!existingUser) {
-      throw new Error('Las credenciales son incorrectas.');
+      throw new Error("Las credenciales son incorrectas.");
     }
     //console.log(existingUser.contrasena);
 
-    const passwordMatch = await bcrypt.compare(contrasena, existingUser.contrasena);
+    const passwordMatch = await bcrypt.compare(
+      contrasena,
+      existingUser.contrasena
+    );
     if (!passwordMatch) {
-      throw new Error('Las credenciales son incorrectas.');
+      throw new Error("Las credenciales son incorrectas.");
     }
     //console.log("Inicio de sesión exitoso");
     //console.log(existingUser);
-    
+
     const accessToken = await createAccessToken(existingUser);
     const refreshToken = await createRefreshToken(existingUser);
 
@@ -94,8 +99,11 @@ const getNewLogin = async (nombre_u, contrasena) => {
     //console.log(accessToken);
     //console.log("refreshToken");
     //console.log(refreshToken);
-    return {existingUser: getUserInfo(existingUser), accessToken, refreshToken };
-
+    return {
+      existingUser: getUserInfo(existingUser),
+      accessToken,
+      refreshToken,
+    };
   } catch (error) {
     throw error;
   }
@@ -107,7 +115,7 @@ function getTokenFromHeader(headers) {
   //ESTO SI LO ESTÁ HACIENDO BIEEEN QUE ES ENTONCES AAA
 
   if (headers && headers.authorization) {
-    const parted = headers.authorization.split(' ');
+    const parted = headers.authorization.split(" ");
     if (parted.length === 2) {
       return parted[1];
     } else {
@@ -120,64 +128,72 @@ function getTokenFromHeader(headers) {
 
 //Funciones para validar tokens
 
-function verifyAccessToken(token){
+function verifyAccessToken(token) {
   return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 }
-function verifyRefreshToken(token){
+function verifyRefreshToken(token) {
   return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 }
 
 //Funcion para refreshToken
 const functionRefreshToken = async (refreshToken) => {
   try {
-    const resultito = await db.any('SELECT * FROM tokens WHERE token = $1',[refreshToken]);
+    const resultito = await db.any("SELECT * FROM tokens WHERE token = $1", [
+      refreshToken,
+    ]);
 
     //NO SE OBTIENE UN RESULTITO
-    if (!resultito){
-      throw new Error('No hay resultito.');
+    if (!resultito) {
+      throw new Error("No hay resultito.");
     }
     //console.log("Estesmiresult");
     //console.log(resultito);
     return resultito;
-
   } catch (error) {
     throw error;
   }
 };
 
 //Funcion para cambiar contraseña
-const changeAdminPassword = async (nombre_u, contrasena, new_password1, new_password2) => {
+const changeAdminPassword = async (
+  nombre_u,
+  contrasena,
+  new_password1,
+  new_password2
+) => {
   try {
-
     //Verificar si existe username con ese nombre
     const existingUser = await db.oneOrNone(
-      'SELECT * FROM usuario WHERE nombre_u = $1',
+      "SELECT * FROM usuario WHERE nombre_u = $1",
       [nombre_u]
     );
 
     if (!existingUser) {
-      throw new Error('Las credenciales son incorrectas.');
+      throw new Error("Las credenciales son incorrectas.");
     }
     //console.log("aaasas",existingUser.contrasena);
 
     const newpasswordsMatch = new_password1 === new_password2;
     if (!newpasswordsMatch) {
-      throw new Error('Las nuevas contraseñas no coinciden.');
+      throw new Error("Las nuevas contraseñas no coinciden.");
     }
 
-    const passwordMatch = await bcrypt.compare(contrasena, existingUser.contrasena);
+    const passwordMatch = await bcrypt.compare(
+      contrasena,
+      existingUser.contrasena
+    );
     if (!passwordMatch) {
-      throw new Error('Las credenciales son incorrectas.');
+      throw new Error("Las credenciales son incorrectas.");
     }
 
     //console.log("Existe el usuario, ahora a cambiar la contraseña");
     //console.log(existingUser);
-    
+
     //Cambiar contraseña
     const newHashedPassword = await bcrypt.hash(new_password1, 10);
-    
+
     const resultito2 = await db.none(
-      'UPDATE usuario SET contrasena = $2 WHERE nombre_u = $1',
+      "UPDATE usuario SET contrasena = $2 WHERE nombre_u = $1",
       [nombre_u, newHashedPassword]
     );
 
@@ -199,7 +215,6 @@ const changeAdminPassword = async (nombre_u, contrasena, new_password1, new_pass
     //   throw error;
     // }
 
-
     // const accessToken = await createAccessToken(existingUser);
     // const refreshToken = await createRefreshToken(existingUser);
 
@@ -209,10 +224,19 @@ const changeAdminPassword = async (nombre_u, contrasena, new_password1, new_pass
     //console.log(refreshToken);
 
     // return {existingUser: getUserInfo(existingUser), accessToken, refreshToken };
-
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = {getNewAdmin, getNewLogin, generateAccessToken, generateRefreshToken, getTokenFromHeader, verifyAccessToken, verifyRefreshToken, functionRefreshToken, changeAdminPassword};
+module.exports = {
+  getNewAdmin,
+  getNewLogin,
+  generateAccessToken,
+  generateRefreshToken,
+  getTokenFromHeader,
+  verifyAccessToken,
+  verifyRefreshToken,
+  functionRefreshToken,
+  changeAdminPassword,
+};

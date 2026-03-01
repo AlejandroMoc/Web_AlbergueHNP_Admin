@@ -88,8 +88,8 @@ const SignUpAdmin = () => {
 
         <h3>Crear un administrador</h3>
 
-        <div><input value={username} onChange={(e) => usernameChange(e)} className="login_inputs universal_limit_input" type="text" minLength="8" maxLength="16" placeholder="Usuario" onkeypress="return event.charCode != 32"></input></div>
-        <div><input value={password} onChange={(e) => passwordChange(e)} className="login_inputs universal_limit_input" type="password" minLength="8" maxLength="16" placeholder="Contraseña" onkeypress="return event.charCode != 32"></input></div>
+        <div><input value={username} onChange={(e) => usernameChange(e)} className="login_inputs universal_limit_input" type="text" minLength="8" maxLength="16" placeholder="Usuario" onKeyPress="return event.charCode != 32"></input></div>
+        <div><input value={password} onChange={(e) => passwordChange(e)} className="login_inputs universal_limit_input" type="password" minLength="8" maxLength="16" placeholder="Contraseña" onKeyPress="return event.charCode != 32"></input></div>
         
         <p className='universal_text_error'>{ErrorMessage}</p>
         {/* <p className='universal_text_success'>{changeSuccessMessage}</p> */}
