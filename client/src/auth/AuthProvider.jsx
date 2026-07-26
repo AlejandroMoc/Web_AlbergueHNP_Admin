@@ -162,39 +162,6 @@ const AuthProvider = ({children }) => {
     }
   }
 
-  //Parece que esta función ni se usa
-  async function getUserInfo(accessToken){
-    try {
-      const response = await fetch ("${API_URL}/user",{
-        method: "GET",
-        headers: {
-          'Content-type': "application/json; charset=UTF-8",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok){
-        // const json = await response.json() as AccessTokenResponse;
-        const json = await response.json();
-        if (json.error){
-          //console.log("LOREM IPSUM B")
-          throw new Error(json.error);
-        }
-        //console.log("LOREM IPSUM 2");
-        const dime =json.body;
-        //console.log(dime);
-        return json.body;
-      }else{
-        throw new Error(response.statusText);
-      }
-
-    } catch (error) {
-      //console.log(error);
-      return null;
-    }
-  }
-
-  //NEW RETURN
   return (
     <AuthContext.Provider
       value={{
