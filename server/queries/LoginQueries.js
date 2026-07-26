@@ -95,10 +95,6 @@ const getNewLogin = async (nombre_u, contrasena) => {
     const accessToken = await createAccessToken(existingUser);
     const refreshToken = await createRefreshToken(existingUser);
 
-    //console.log("accessToken");
-    //console.log(accessToken);
-    //console.log("refreshToken");
-    //console.log(refreshToken);
     return {
       existingUser: getUserInfo(existingUser),
       accessToken,
@@ -110,9 +106,6 @@ const getNewLogin = async (nombre_u, contrasena) => {
 };
 
 function getTokenFromHeader(headers) {
-  //console.log("JAJAJAJ");
-  //console.log(headers);
-  //ESTO SI LO ESTÁ HACIENDO BIEEEN QUE ES ENTONCES AAA
 
   if (headers && headers.authorization) {
     const parted = headers.authorization.split(" ");
@@ -146,8 +139,6 @@ const functionRefreshToken = async (refreshToken) => {
     if (!resultito) {
       throw new Error("No hay resultito.");
     }
-    //console.log("Estesmiresult");
-    //console.log(resultito);
     return resultito;
   } catch (error) {
     throw error;
@@ -214,14 +205,6 @@ const changeAdminPassword = async (
     // } catch (error) {
     //   throw error;
     // }
-
-    // const accessToken = await createAccessToken(existingUser);
-    // const refreshToken = await createRefreshToken(existingUser);
-
-    //console.log("accessToken");
-    //console.log(accessToken);
-    //console.log("refreshToken");
-    //console.log(refreshToken);
 
     // return {existingUser: getUserInfo(existingUser), accessToken, refreshToken };
   } catch (error) {

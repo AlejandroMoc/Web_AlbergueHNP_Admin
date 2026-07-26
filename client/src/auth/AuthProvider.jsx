@@ -40,23 +40,23 @@ const AuthProvider = ({children }) => {
   }
 
   function setAccessTokenAndRefreshToken( accessToken, refreshToken) {
-    //console.log("setAccessTokenAndRefreshToken", accessToken, refreshToken);
+
+    // Set tokens
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
-    Cookies.set("refreshToken", refreshToken);
-    //localStorage.setItem("token", JSON.stringify({refreshToken }));
+  
+    // Store both tokens in localStorage for persistence
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", JSON.stringify({ refreshToken }));
   }
 
   function getRefreshToken() {
     if (!!refreshToken) {
       return refreshToken;
     }
-    //const token = localStorage.getItem("token");
     const token = Cookies.get("refreshToken");
     if (token){
       const {refreshToken} = JSON.parse(token);
-      //console.log("WIIIIII");
-      //console.log({refreshToken});
       setRefreshToken(refreshToken);
       return refreshToken;
     }
@@ -77,7 +77,9 @@ const AuthProvider = ({children }) => {
   }
 
   function signOut(){
-    //localStorage.removeItem("token");
+    // Clear both localStorage and cookies
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     Cookies.remove("refreshToken");
     setAccessToken("");
     setRefreshToken("");
@@ -87,41 +89,33 @@ const AuthProvider = ({children }) => {
 
   async function checkAuth() {
     try {
-      //console.log("El accesstoken que no quiere agarrar es", accessToken);
-      //Si existe el accessToken, retribuirlo
-      if (!!accessToken) {
-        const userInfo = await retrieveUserInfo(accessToken);
-        //console.log('CHECA1');
-        //console.log(user);
+      // First, try to restore accessToken from localStorage
+      const storedAccessToken = localStorage.getItem("accessToken");
+      if (!!storedAccessToken) {
+        const userInfo = await retrieveUserInfo(storedAccessToken);
         setUser(userInfo);
-        //console.log(user);
-        setAccessToken(accessToken);
+        setAccessToken(storedAccessToken);
         setIsAuthenticated(true);
         setIsLoading(false);
+      
+      
+      // If no accessToken in localStorage, try to get a new one using refreshToken
       } else {
-        //CESAR AQUI se está yendo el código y no debería
-        // const token = localStorage.getItem("token");
-        const token = Cookies.get("refreshToken");
-        if (token) {
-          //console.log("useEffect: token", token);
-          // const refreshToken = JSON.parse(token).refreshToken;
-          const refreshToken = JSON.parse(token).refreshToken;
-          //Si no existe el access token, voy a pedir un nuevo access token
-          //console.log("Voy a pedir un nuevo token");
+        const storedRefreshToken = localStorage.getItem("refreshToken");
+        if (storedRefreshToken) {
+          const refreshTokenData = JSON.parse(storedRefreshToken);
+          const refreshToken = refreshTokenData.refreshToken;
+
+          // If no refreshToken, retrieve a new one
           getNewAccessToken(refreshToken)
             .then(async (newToken) => {
-              //console.log("El nuevo token es",newToken);
               const userInfo = await retrieveUserInfo(newToken);
-              //console.log('CHECA2');
-              //console.log(userInfo);
-              //console.log('Este es userInfo:', userInfo);
               setUser(userInfo);
               setAccessToken(newToken);
               setIsAuthenticated(true);
               setIsLoading(false);
             })
             .catch((error) => {
-              //console.log(error);
               setIsLoading(false);
             });
         } else {
@@ -129,23 +123,18 @@ const AuthProvider = ({children }) => {
         }
       }
     } catch (error) {
-      //console.log("quesera",error);
       setIsLoading(false);
     }
   }
 
   useEffect(()=>{
     checkAuth();
-    //console.log('Se llamó a checkAUTH');
   },[]);
   
   //el requestNewAccessToken se manda a llamar en la funcion checkAuth, en este mismo archivo
   async function requestNewAccessToken(refreshToken) {
-    //console.log("Sí está sacando aqui un refreshToken");
-    //console.log("Hasta aquí está bien");
-    //console.log(refreshToken);
+    
     try {
-      
       const response = await fetch(`${API_URL}/refreshtoken`, {
         method: "POST",
         headers: {
@@ -154,36 +143,21 @@ const AuthProvider = ({children }) => {
         },
         body: JSON.stringify({refreshToken }),
       });
-  
-      //console.log("MIRAMEAAAA");
-      //console.log(response)
 
       if (response.ok) {
-        //console.log('OK?');
         const json = await response.json();
-        //console.log("OKI");
-        //console.log(json)
-        //console.log("OKI");
         if (json.error) {
           throw new Error(json.error);
         }
-        //TODO checar si es .body o sin el .body
+
         const accessToken = json.body.accessToken
-        //console.log("Dime el access token A", accessToken);
         return accessToken;
       } else {
         const errorResponse = await response.json();
-        // CHECAR QUE SE VA DIRECTO A AQUI Y NO SE POR QUE
-        //console.log("Luego se va aqui, lo que quiere decir que no está regresando una respuesta ok");
-        //console.log("33333333333");
-        //console.log("Error Response:", errorResponse);
-        //console.log("Response Status Text:", response.statusText);
         throw new Error(errorResponse.error || response.statusText);
 
       }
     } catch (error) {
-      // CHECAR AQUI
-      //console.log("11111111",error);
       return null;
     }
   }
