@@ -58,28 +58,43 @@ Before you begin, it is important to have the following:
    sudo -u postgres psql
    ```
 
+   Create the database and give it a password
    ```sql
-
-   // Create the DB
-   CREATE DATABASE gestionAlbergue;
-
-   // Give password if needed
+   CREATE DATABASE shelter_management;
    ALTER USER postgres WITH PASSWORD 'my_password';
+   ```
 
-   // Exit the console
+   <!-- Create the necessary role and permissions -->
+   <!-- CREATE ROLE alejandro WITH LOGIN PASSWORD 'your_password';
+   GRANT ALL PRIVILEGES ON DATABASE shelter_management TO alejandro;
+   GRANT SELECT ON usuario TO alejandro;
+   GRANT UPDATE ON usuario TO alejandro;
+   GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO alejandro;
+   GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO alejandro;
+   GRANT USAGE ON SCHEMA pgagent TO alejandro;
+   GRANT SELECT ON ALL TABLES IN SCHEMA pgagent TO alejandro; -->
+
+   Exit the console
+   ```sql
    \q
    ```
 
-   Go to the main path of the project and restore the `dump/dump_2.26_data.sql` file, which is the initial data.
-
+   Install the PGAgent extension
    ```bash
-   pg_restore --clean --if-exists --no-owner --username=postgres --dbname=gestionAlbergue dump/dump_2.26_data.sql
+   psql -U postgres -d shelter_management -c "CREATE EXTENSION pgagent;"
    ```
 
-3. **Install pgAdmin 4**:
+   Go to the main path of the project and restore the `dump/dump_2.28.sql` file, which is the initial data.
+
+   ```bash
+   pg_restore --clean --if-exists --no-owner --superuser=postgres --username=postgres --dbname=shelter_management dump/dump_2.28.sql
+   ```
+
+3. **Install pgAdmin 4 and pgagent**:
 
    ```bash
    yay -S pgadmin4-server-bin pgadmin4-desktop-bin
+   yay -S pgagent
 
    # For OpenRC
    sudo rc-update add postgresql default
@@ -135,11 +150,15 @@ The backend is a Node.js application.
 
    ```env
    # PostgreSQL Database Connection
-   DB_USER=username
+   DB_USER=postgres
    DB_HOST=localhost
-   DB_DATABASE=gestionAlbergue
+   DB_DATABASE=shelter_management
    DB_PASSWORD=my_password
    DB_PORT=5432
+
+   ACCESS_TOKEN_SECRET=75e9afa6-e2db-48e5-9b4f-a3a7ad37d706
+   REFRESH_TOKEN_SECRET=c698f55b-98c4-4ddf-ab51-cfaa36f05095
+
    ```
 
 3. **Run the server**:
@@ -188,6 +207,14 @@ The frontend is a React application.
 
    This will automatically open a new tab in your web browser. 
    If it doesn't, you can access it at [http://localhost:3000](http://localhost:3000).
+
+   Try to log in with the default admin user:
+   ```
+      username: hola1234
+      password: hola1234
+   ```
+
+   Also try changing the ACCESS_TOKEN_SECRET and REFRESH_TOKEN_SECRET variables in the .env file.
 
 ---
 
