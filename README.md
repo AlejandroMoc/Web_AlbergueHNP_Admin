@@ -6,6 +6,10 @@ In collaboration with the Instituto Tecnológico y de Estudios Superiores de Mon
 
 Application developed from February 19 to June 14, 2024. Delivered on June 12, 2024.
 
+<img src="doc/screenshot_manager_home.png" alt="Main Menu of the Manager" width="600">
+
+<img src="doc/screenshot_manager_beds.png" alt="Bed management interface" width="600">
+
 ## Instructions
 
 You can find the set-up guide in [INSTRUCTIONS.md](doc/INSTRUCTIONS.md)
